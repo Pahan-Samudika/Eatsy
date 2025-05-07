@@ -1,0 +1,60 @@
+# Node.js (Backend Microservices)
+services/**/node_modules/
+services/**/logs/
+services/**/npm-debug.log
+services/**/yarn-error.log
+services/**/package-lock.json
+
+# Node.js (API Gateway)
+api-gateway/**/node_modules/
+api-gateway/**/logs/
+api-gateway/**/npm-debug.log
+api-gateway/**/yarn-error.log
+api-gateway/**/package-lock.json
+
+# React Frontend (web-client)
+web-client/node_modules/
+web-client/build/
+web-client/.env.local
+web-client/.env.development.local
+web-client/.env.test.local
+web-client/.env.production.local
+web-client/npm-debug.log
+web-client/yarn-error.log
+web-client/package-lock.json
+
+# React Frontend (admin-panel)
+admin-panel/node_modules/
+admin-panel/build/
+admin-panel/.env.local
+admin-panel/.env.development.local
+admin-panel/.env.test.local
+admin-panel/.env.production.local
+admin-panel/npm-debug.log
+admin-panel/yarn-error.log
+admin-panel/package-lock.json
+
+
+# Docker
+**/.dockerignore
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Editor Settings
+.vscode/
+.idea/
+*.swp
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+*.env
+.env.*
+*.tgz
