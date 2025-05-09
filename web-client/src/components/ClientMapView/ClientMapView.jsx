@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import axios from 'axios';
 import MapContainer from '../DeliveryMap/MapContainer';
@@ -16,113 +16,89 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 const ClientMapView = ({ orderData }) => {
   const mapRef = useRef(null);
   const deliveryPersonMarkerRef = useRef(null);
+  const didFetchRef = useRef(false);
 
   const [orderDetails, setOrderDetails] = useState(orderData);
   const [showMarkers, setShowMarkers] = useState(false);
 
-  const fetchOrderDetails = async () => {
-    if (!orderData) {
-      console.error('Order data is not provided.');
-      return;
-    }
+  // Fetch order details only once
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      if (!orderData || didFetchRef.current) return;
+      
+      didFetchRef.current = true;
+      
+      if (!orderData.restaurantLocation || !orderData.customerLocation) {
+        try {
+          const response = await axios.get(orderAPI.getOrderByID(orderData._id));
+          const order = response.data;
 
-    if (!orderData.restaurantLocation || !orderData.customerLocation) {
-      try {
-        const response = await axios.get(orderAPI.getOrderByID(orderData._id));
-        const order = response.data;
+          const restaurantResponse = await axios.get(userAPI.getRestaurantByID(order.restaurantID));
+          const restaurant = restaurantResponse.data;
 
-        const restaurantResponse = await axios.get(userAPI.getRestaurantByID(order.restaurantID));
-        const restaurant = restaurantResponse.data;
+          const updatedOrderDetails = {
+            orderId: order._id,
+            customerName: order.customerID,
+            restaurantName: restaurant.name,
+            restaurantLocation: restaurant.location.coordinates,
+            customerLocation: order.deliveryLocation.location.coordinates,
+            items: order.items,
+            status: order.status,
+            createdAt: order.createdAt,
+            updatedAt: order.updatedAt,
+          };
 
-        const updatedOrderDetails = {
-          orderId: order._id,
-          customerName: order.customerID,
-          restaurantName: restaurant.name,
-          restaurantLocation: restaurant.location.coordinates,
-          customerLocation: order.deliveryLocation.location.coordinates,
-          items: order.items,
-          status: order.status,
-          createdAt: order.createdAt,
-          updatedAt: order.updatedAt,
-        };
-
-        setOrderDetails(updatedOrderDetails);
+          setOrderDetails(updatedOrderDetails);
+          setShowMarkers(true);
+        } catch (error) {
+          console.error('Error fetching order details:', error);
+        }
+      } else {
+        setOrderDetails(orderData);
         setShowMarkers(true);
-        drawMarkersAndRoute(updatedOrderDetails); // Unified function to handle markers and route
-      } catch (error) {
-        console.error('Error fetching order details:', error);
       }
-    } else {
-      setOrderDetails(orderData);
-      setShowMarkers(true);
-      drawMarkersAndRoute(orderData); // Unified function to handle markers and route
-    }
-  };
+    };
 
-  const drawMarkersAndRoute = async (details) => {
-    if (!details || !details.restaurantLocation || !details.customerLocation) {
-      console.error('Order details or locations are not initialized.');
-      return;
-    }
+    fetchOrderDetails();
+  }, [orderData]);
 
-    const restaurantCoordinates = details.restaurantLocation;
-    const customerCoordinates = details.customerLocation;
+  // Draw route once when orderDetails is available and markers are shown
+  useEffect(() => {
+    const drawRoute = async () => {
+      if (!orderDetails || !showMarkers || !mapRef.current) return;
+      
+      try {
+        const restaurantCoordinates = orderDetails.restaurantLocation;
+        const customerCoordinates = orderDetails.customerLocation;
+        
+        // Validate coordinates
+        if (!Array.isArray(restaurantCoordinates) || restaurantCoordinates.length !== 2 || 
+            !Array.isArray(customerCoordinates) || customerCoordinates.length !== 2) {
+          console.error('Invalid coordinates');
+          return;
+        }
+        
+        // Fetch and draw the route
+        const coordinates = `${restaurantCoordinates[0]},${restaurantCoordinates[1]};${customerCoordinates[0]},${customerCoordinates[1]}`;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
 
-    // Validate coordinates
-    if (
-      !Array.isArray(restaurantCoordinates) ||
-      restaurantCoordinates.length !== 2 ||
-      isNaN(restaurantCoordinates[0]) ||
-      isNaN(restaurantCoordinates[1]) ||
-      !Array.isArray(customerCoordinates) ||
-      customerCoordinates.length !== 2 ||
-      isNaN(customerCoordinates[0]) ||
-      isNaN(customerCoordinates[1])
-    ) {
-      console.error('Invalid coordinates:', { restaurantCoordinates, customerCoordinates });
-      return;
-    }
+        const response = await fetch(url);
+        const data = await response.json();
 
-    // Draw restaurant and customer markers
-    if (mapRef.current) {
-      const restaurantIcon = 'https://cdn-icons-png.flaticon.com/128/3448/3448332.png';
-      const customerIcon = 'https://cdn-icons-png.flaticon.com/128/5974/5974636.png';
+        if (!data.routes || data.routes.length === 0) {
+          console.error('No routes found:', data);
+          return;
+        }
 
-      new mapboxgl.Marker({ color: 'red' })
-        .setLngLat(restaurantCoordinates)
-        .setPopup(new mapboxgl.Popup().setText('Restaurant Location'))
-        .addTo(mapRef.current);
+        const route = data.routes[0].geometry;
 
-      new mapboxgl.Marker({ color: 'blue' })
-        .setLngLat(customerCoordinates)
-        .setPopup(new mapboxgl.Popup().setText('Customer Location'))
-        .addTo(mapRef.current);
-    }
-
-    // Fetch and draw the route
-    const coordinates = `${restaurantCoordinates[0]},${restaurantCoordinates[1]};${customerCoordinates[0]},${customerCoordinates[1]}`;
-    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (!data.routes || data.routes.length === 0) {
-        console.error('No routes found:', data);
-        return;
-      }
-
-      const route = data.routes[0].geometry;
-
-      if (mapRef.current) {
         if (mapRef.current.getSource('route')) {
-          // Update existing route source
           mapRef.current.getSource('route').setData({
             type: 'Feature',
             geometry: route,
           });
         } else {
-          // Add new route source and layer
+          // Only add the source and layer once
           mapRef.current.addSource('route', {
             type: 'geojson',
             data: {
@@ -146,17 +122,26 @@ const ClientMapView = ({ orderData }) => {
           });
         }
 
-        // Fly to the route
-        mapRef.current.flyTo({ center: restaurantCoordinates, zoom: 12 });
+        // Fly to the route once
+        mapRef.current.flyTo({ 
+          center: restaurantCoordinates, 
+          zoom: 12,
+          speed: 0.8  // Slower animation to prevent dizziness
+        });
+      } catch (error) {
+        console.error('Error drawing route:', error);
       }
-    } catch (error) {
-      console.error('Error fetching route:', error);
-    }
-  };
+    };
 
-  useEffect(() => {
-    fetchOrderDetails();
-  }, [orderData]);
+    // Add event listener to ensure the map is loaded before drawing the route
+    if (mapRef.current) {
+      if (mapRef.current.loaded()) {
+        drawRoute();
+      } else {
+        mapRef.current.once('load', drawRoute);
+      }
+    }
+  }, [orderDetails, showMarkers]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '800px' }}>
@@ -166,8 +151,8 @@ const ClientMapView = ({ orderData }) => {
         customerLocation={orderDetails?.customerLocation}
         deliveryPersonMarkerRef={deliveryPersonMarkerRef}
         showMarkers={showMarkers}
-        nearbyOrders={[]} // No nearby orders in client view
-        onOrderClick={() => {}} // No order click handling in client view
+        nearbyOrders={[]}
+        onOrderClick={() => {}}
       />
     </div>
   );

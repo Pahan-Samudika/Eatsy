@@ -17,7 +17,7 @@ const orderSchema = new mongoose.Schema(
         "preparing",
         "ready",
         "assigned",
-        "pickup",
+        "picked_up",
         "delivered",
       ],
       default: "pending",
