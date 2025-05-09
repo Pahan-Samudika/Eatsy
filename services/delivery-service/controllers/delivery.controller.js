@@ -9,7 +9,7 @@ const USER_SERVICE_URL =
 
 exports.assignDeliveryPerson = async (req, res) => {
   try {
-    const { id, restaurantId, customerId, deliveryAddress, deliveryPersonId } =
+    const { id, restaurantId, customerId, deliveryLocation, deliveryPersonId } =
       req.body;
     console.log("Assigning delivery person for order ID:", id);
 
@@ -24,13 +24,27 @@ exports.assignDeliveryPerson = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    if (order.status !== "ready") {
-      console.log("Invalid order status:", order.status);
-      return res.status(400).json({ error: "Invalid order" });
+    // Check if order is already assigned
+    if (order.status === "assigned" || order.status === "picked_up" || order.status === "delivered") {
+      console.log("Order already assigned:", order.status);
+      return res.status(400).json({ error: "Order is already assigned to a delivery person" });
+    }
+
+    // Check if order is ready for assignment
+    if (order.status !== "ready" && order.status !== "preparing" && order.status !== "accepted") {
+      console.log("Invalid order status for assignment:", order.status);
+      return res.status(400).json({ error: `Cannot assign order with status: ${order.status}` });
+    }
+
+    // Check if there's already a delivery record for this order
+    const existingDelivery = await Delivery.findOne({ orderId: id });
+    if (existingDelivery) {
+      console.log("Order already has a delivery record:", existingDelivery);
+      return res.status(400).json({ error: "Order is already assigned to a delivery person" });
     }
 
     // Find available delivery person from User Service
-    const { coordinates } = deliveryAddress.location;
+    const { coordinates } = deliveryLocation.location;
     let deliveryPersons;
     try {
       const response = await axios.get(
@@ -51,7 +65,7 @@ exports.assignDeliveryPerson = async (req, res) => {
       deliveryPersonId: deliveryPerson._id,
       restaurantId,
       customerId,
-      deliveryAddress,
+      deliveryLocation : deliveryLocation,
       status: "assigned",
     });
     await delivery.save();
@@ -149,12 +163,12 @@ exports.updateDeliveryStatus = async (req, res) => {
     if (status === "delivered") {
       try {
         await axios.put(
-          `${USER_SERVICE_URL}/api/deliverPerson/${delivery.deliveryPersonId}`,
+          `${USER_SERVICE_URL}/api/deliveryPerson/${delivery.deliveryPersonId}`,
           { availability: true }
           // { headers: { Authorization: `Bearer ${process.env.SERVICE_JWT}` } }
         );
       } catch (error) {
-        console.error("Failed to update delivery person:", error.message);
+        console.error("Failed to update delivery person:",delivery.deliveryPersonId, error.message);
       }
     }
 

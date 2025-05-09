@@ -21,6 +21,6 @@ const deliverySchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-deliverySchema.index({ 'deliveryAddress.location': '2dsphere' });
+deliverySchema.index({ 'deliveryLocation.location': '2dsphere' });
 
 module.exports = mongoose.model('Delivery', deliverySchema);

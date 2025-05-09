@@ -10,5 +10,15 @@ export const orderAPI = {
     updateDeliveryPersonID: (id) => `${ORDERS_API_URL}/order/deliveryPerson/${id}`,
     updatePaymentID: (id) => `${ORDERS_API_URL}/order/payment/${id}`,
     updateOrderStatus: (id) => `${ORDERS_API_URL}/order/status/${id}`,
-    getNearbyOrders: (lat, lng) => `${ORDERS_API_URL}/order/nearby?lat=${lat}&lng=${lng}`,
+    getNearbyOrders: (lat, lng, maxDistance = 50000) => {
+        return `${ORDERS_API_URL}/order/nearby?lat=${lat}&lng=${lng}&maxDistance=${maxDistance}&status=ready`;
+    },
+    
+    debugEndpoints: () => {
+        console.log("ORDERS_API_URL:", ORDERS_API_URL);
+        return {
+            nearby: (lat, lng) => orderAPI.getNearbyOrders(lat, lng),
+            baseUrl: ORDERS_API_URL
+        };
+    }
 };

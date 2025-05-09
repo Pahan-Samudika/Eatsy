@@ -15,6 +15,30 @@ import { formatCustomDate } from "../../utils/format-utils/DateUtil";
 import OrderHistoryByPersonId from "./OrderHistoryByPersonId";
 import { useDeliveryPerson } from '../../utils/redux-utils/redux-delivery';
 
+// Create a utility function to deduplicate orders
+const deduplicateOrders = (orders) => {
+  const uniqueOrders = new Map();
+  
+  if (Array.isArray(orders)) {
+    orders.forEach(order => {
+      const orderKey = order._id || order.orderID || order.orderId;
+      
+      if (orderKey && (!uniqueOrders.has(orderKey) || 
+          (order.updatedAt && uniqueOrders.get(orderKey).updatedAt && 
+           new Date(order.updatedAt) > new Date(uniqueOrders.get(orderKey).updatedAt)))) {
+        uniqueOrders.set(orderKey, {
+          ...order,
+          // Ensure we're using consistent ID property
+          _id: orderKey,
+          orderId: orderKey
+        });
+      }
+    });
+  }
+  
+  return Array.from(uniqueOrders.values());
+};
+
 function OrderRequests() {
   const toast = useToast();
   const [orders, setOrders] = useState([]);
@@ -119,18 +143,24 @@ function OrderRequests() {
     connectDeliverySocket(deliveryPersonID);
 
     listenNewOrder((newOrder) => {
-      setOrders((prev) => [...prev, newOrder]);
+      // Update with deduplication
+      setOrders((prev) => deduplicateOrders([...prev, newOrder]));
       toast.info("You have a new order!");
     });
 
     listenOrderReady((orderData) => {
       toast.success(`Order ${orderData.refNo} is ready for delivery!`);
-      // Add the ready order to the orders state
+      // Add the ready order to the orders state with deduplication
       setOrders((prev) => {
         // Check if the order already exists in the state
-        const orderExists = prev.some((order) => order._id === orderData._id);
+        const orderExists = prev.some((order) => 
+          (order._id === orderData._id) || 
+          (order.orderID === orderData.orderID) || 
+          (order.orderId === orderData.orderId)
+        );
+        
         if (!orderExists) {
-          return [...prev, orderData];
+          return deduplicateOrders([...prev, orderData]);
         }
         return prev;
       });
@@ -178,7 +208,7 @@ function OrderRequests() {
           restaurantId: orderDetails.restaurantID,
           deliveryPersonId: deliveryPersonID,
           customerId: orderDetails.customerID,
-          deliveryAddress: {
+          deliveryLocation: {
             location: orderDetails.deliveryLocation.location,
             address: orderDetails.deliveryLocation.address,
           },
@@ -227,6 +257,7 @@ function OrderRequests() {
         {orders.length > 0 ? (
           orders.map((order, index) => (
             <li
+              key={`order-request-${order._id || order.orderID || order.orderId || index}`}
               onClick={() => handleItemClick(order)}
               className="list-row hover:bg-base-200 mx-2"
             >

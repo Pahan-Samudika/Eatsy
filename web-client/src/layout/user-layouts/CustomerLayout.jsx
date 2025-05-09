@@ -7,6 +7,7 @@ import RestaurantView from "../../pages/customer/RestaurantView";
 import Checkout from "../../pages/customer/Checkout";
 import MyOrders from "../../pages/customer/MyOrders";
 import MyCardsPage from '../../pages/customer/payment/MyCardsPage';
+import OrderDetailPage from "../../pages/customer/OrderDetailPage";
 
 function CustomerLayout() {
   const sections = [
@@ -26,6 +27,8 @@ function CustomerLayout() {
         <Route path="/checkout/:cartId/:amount" element={<Checkout />} />
         
         <Route path="/my-cards" element={<MyCardsPage/>}/>
+        
+        <Route path="/order-details/:orderId" element={<OrderDetailPage />} />
       </Routes>
     </div>
   );

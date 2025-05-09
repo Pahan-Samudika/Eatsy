@@ -65,12 +65,15 @@ const getOrderById = async (req, res) => {
 // Get nearby orders for delivery (within x km)
 const getNearbyOrders = async (req, res) => {
   try {
-    const { lat, lng, maxDistance = 500000 } = req.query;
+    const { lat, lng, maxDistance = 500000, status = "ready" } = req.query;
+    
+    console.log("Getting nearby orders with params:", { lat, lng, maxDistance, status });
+    
     if (!lat || !lng)
       return res.status(400).json({ error: "lat and lng required" });
 
-    const nearbyOrders = await Order.find({
-      status: "ready",
+    // Log the query being sent to MongoDB
+    const query = {
       "deliveryLocation.location": {
         $nearSphere: {
           $geometry: {
@@ -79,11 +82,36 @@ const getNearbyOrders = async (req, res) => {
           },
           $maxDistance: parseInt(maxDistance),
         },
-      },
-    });
+      }
+    };
+    
+    // Add status filter if provided, otherwise default to "ready"
+    if (status) {
+      query.status = status;
+    }
+    
+    console.log("MongoDB query:", JSON.stringify(query));
+    
+    const nearbyOrders = await Order.find(query);
+    
+    console.log(`Found ${nearbyOrders.length} nearby orders`);
+    
+    // If no orders found with status="ready", also fetch orders with status="preparing"
+    // This helps when testing with limited data
+    if (nearbyOrders.length === 0 && status === "ready") {
+      console.log("No ready orders found, checking for preparing orders");
+      const preparingOrders = await Order.find({
+        ...query,
+        status: "preparing"
+      });
+      
+      console.log(`Found ${preparingOrders.length} preparing orders as fallback`);
+      return res.json(preparingOrders);
+    }
 
     res.json(nearbyOrders);
   } catch (err) {
+    console.error("Error in getNearbyOrders:", err);
     res.status(500).json({ error: err.message });
   }
 };
