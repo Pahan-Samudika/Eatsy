@@ -57,55 +57,61 @@ function Reports() {
     : paybacks.filter(p => p.receiverType === filterType);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-10">
       <h2 className="text-2xl font-bold">Revenue</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="stat">
-          <div className="stat-title">Total Paybacks</div>
-          <div className="stat-value text-primary">Rs. {totalPaybacks.toFixed(2)}</div>
+      {/* Stats and Commission Settings Side by Side */}
+      <div className="flex flex-col lg:flex-row justify-between gap-6">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
+          <div className="stat">
+            <div className="stat-title">Total Paybacks</div>
+            <div className="stat-value text-primary">Rs. {totalPaybacks.toFixed(2)}</div>
+          </div>
+          <div className="stat">
+            <div className="stat-title">Platform Revenue</div>
+            <div className="stat-value text-success">Rs. {totalRevenue.toFixed(2)}</div>
+          </div>
+          <div className="stat">
+            <div className="stat-title">Total Paybacks Count</div>
+            <div className="stat-value text-info">{paybacks.length}</div>
+          </div>
+          <div className="stat">
+            <div className="stat-title">Profit from Restaurants</div>
+            <div className="stat-value text-secondary">Rs. {restaurantProfit.toFixed(2)}</div>
+          </div>
+          <div className="stat">
+            <div className="stat-title">Profit from Delivery</div>
+            <div className="stat-value text-accent">Rs. {deliveryProfit.toFixed(2)}</div>
+          </div>
         </div>
-        <div className="stat">
-          <div className="stat-title">Platform Revenue</div>
-          <div className="stat-value text-success">Rs. {totalRevenue.toFixed(2)}</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">Total Paybacks Count</div>
-          <div className="stat-value text-info">{paybacks.length}</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">Profit from Restaurants</div>
-          <div className="stat-value text-secondary">Rs. {restaurantProfit.toFixed(2)}</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">Profit from Delivery</div>
-          <div className="stat-value text-accent">Rs. {deliveryProfit.toFixed(2)}</div>
+
+        {/* Commission Settings Card */}
+        <div className="card bg-base-100 shadow-md p-4 w-full lg:w-80 self-start">
+          <h3 className="text-lg font-semibold mb-4">Commission Settings</h3>
+          <div className="form-control mb-2">
+            <label className="label">Restaurant Commission (%)</label>
+            <input
+              type="number"
+              value={restaurantRate}
+              onChange={(e) => setRestaurantRate(Number(e.target.value))}
+              className="input input-bordered"
+            />
+          </div>
+          <div className="form-control mb-2">
+            <label className="label">Delivery Commission (%)</label>
+            <input
+              type="number"
+              value={deliveryRate}
+              onChange={(e) => setDeliveryRate(Number(e.target.value))}
+              className="input input-bordered"
+            />
+          </div>
+          <button onClick={updateCommission} className="btn btn-primary mt-2">Update Commission</button>
         </div>
       </div>
 
-      <div className="card bg-base-100 shadow-md p-4 max-w-xl">
-        <h3 className="text-lg font-semibold mb-4">Commission Settings</h3>
-        <div className="form-control mb-2">
-          <label className="label">Restaurant Commission (%)</label>
-          <input
-            type="number"
-            value={restaurantRate}
-            onChange={(e) => setRestaurantRate(Number(e.target.value))}
-            className="input input-bordered"
-          />
-        </div>
-        <div className="form-control mb-2">
-          <label className="label">Delivery Commission (%)</label>
-          <input
-            type="number"
-            value={deliveryRate}
-            onChange={(e) => setDeliveryRate(Number(e.target.value))}
-            className="input input-bordered"
-          />
-        </div>
-        <button onClick={updateCommission} className="btn btn-primary mt-2">Update Commission</button>
-      </div>
-
+      {/* Paybacks Table */}
       <div className="mt-10">
         <h3 className="text-xl font-semibold mb-2">Paybacks Table</h3>
 
@@ -140,10 +146,16 @@ function Reports() {
                 <tr key={pb._id}>
                   <td>{i + 1}</td>
                   <td>{pb.refNo}</td>
-                  <td>{pb.receiverType == "restaurant" ? "Restaurant": "Delivery"}</td>
+                  <td>{pb.receiverType === "restaurant" ? "Restaurant" : "Delivery"}</td>
                   <td>Rs. {pb.amountReceived.toFixed(2)}</td>
                   <td>Rs. {pb.platformCommission.toFixed(2)}</td>
-                  <td>{pb.status == "completed"? <div className="badge badge-outline badge-success">Completed</div> : <div className="badge badge-outline badge-warning">Pending</div>}</td>
+                  <td>
+                    {pb.status === "completed" ? (
+                      <div className="badge badge-outline badge-success">Completed</div>
+                    ) : (
+                      <div className="badge badge-outline badge-warning">Pending</div>
+                    )}
+                  </td>
                   <td>{new Date(pb.date).toLocaleDateString()}</td>
                 </tr>
               ))}
