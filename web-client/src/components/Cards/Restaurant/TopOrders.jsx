@@ -20,7 +20,7 @@ function TopOrders() {
   }, []);
 
   return (
-    <ul className="list bg-base-300 rounded-box shadow-md">
+    <ul className="list bg-base-300 rounded-box shadow-md w-full max-h-[60vh] overflow-y-auto">
       <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
         Top Orders This Week
       </li>
