@@ -9,6 +9,7 @@ function TopOrders() {
   const fetchMyTopOrders = async () => {
     try {
       const response = await getMyTopOrders();
+      console.log("Top Orders:", response);
       setTopOrders(response);
     } catch (error) {
       console.error("Failed to fetch menu items:", error.message);
