@@ -8,20 +8,22 @@ import {
   ShoppingCartButton,
   LocationSelectButton,
 } from "../../components";
-import { foodCategories } from "../../constants";
-import { getAllRestaurants } from "../../utils/fetch-utils/customer/fetch-user";
+import { getAllRestaurants, getAllRestaurantsWithCategories } from "../../utils/fetch-utils/customer/fetch-user";
+import { getAllCategories } from "../../utils/fetch-utils/customer/fetch-restaurant";
 
 function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [foodCategories, setFoodCategories] = useState([]);
   const [featuredRestaurants, setFeaturedRestaurants] = useState([]);
   const [isRestaurantsLoading, setIsRestaurantsLoading] = useState(true);
 
   const fetchAllRestaurants = async () => {
     setIsRestaurantsLoading(true);
     try {
-      const response = await getAllRestaurants();
+      const response = await getAllRestaurantsWithCategories();
       setIsRestaurantsLoading(false);
+      console.log("Fetched restaurants:", response);
       return response;
     } catch (error) {
       console.error("Failed to fetch restaurants:", error.message);
@@ -30,9 +32,24 @@ function Home() {
     }
   };
 
+  const fetchAllCategories = async () => {
+    try {
+      const response = await getAllCategories();
+      console.log("Fetched categories:", response);
+      return response;
+    } catch (error) {
+      console.error("Failed to fetch categories:", error.message);
+      return [];
+    }
+  }
+
   useEffect(() => {
     fetchAllRestaurants().then((restaurants) => {
       setFeaturedRestaurants(restaurants);
+    });
+
+    fetchAllCategories().then((categories) => {
+      setFoodCategories(categories);
     });
   }, []);
 
