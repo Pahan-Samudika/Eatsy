@@ -44,7 +44,7 @@ const getOrders = async (req, res) => {
     if (req.query.customerID) filter.customerID = req.query.customerID;
     if (req.query.restaurantID) filter.restaurantID = req.query.restaurantID;
 
-    const orders = await Order.find(filter);
+    const orders = await Order.find(filter).sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ error: err.message });

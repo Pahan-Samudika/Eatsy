@@ -30,7 +30,7 @@ function OrderAccordionItem({ order, isFirstItem }) {
         </div>
         <div className="flex flex-row items-center gap-4">
           <small>{formatCustomDate(order.createdAt)}</small>
-          <MapViewButton />
+          {order.status==="assigned" || order.status==="picked_up" && <MapViewButton />}
         </div>
       </div>
       <div className="collapse-content text-sm">
