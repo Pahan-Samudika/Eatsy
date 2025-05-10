@@ -35,6 +35,16 @@ export const getAllRestaurants = async () => {
   }
 };
 
+export const getAllRestaurantsWithCategories = async () => {
+  try {
+      const response = await axios.get(restaurantAPI.getAllRestaurantsWithCategories);
+      return response.data;
+  } catch (error) {
+      console.error("Failed to fetch restaurants with categories:", error.message);
+      return [];
+  }
+};
+
 export const getRestaurantByID = async (id) => {
   try {
       const response = await axios.get(`${userAPI.getRestaurantByID(id)}`);
