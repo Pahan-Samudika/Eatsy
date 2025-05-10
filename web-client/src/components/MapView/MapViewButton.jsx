@@ -15,7 +15,7 @@ function MapViewButton() {
 
   return (
     <>
-      <button className="btn btn-primary rounded-full text-sm z-10" onClick={handleModalOpen}><PiMapPinFill />View Map</button>
+      <button className="btn btn-primary btn-sm rounded-full text-sm z-10" onClick={handleModalOpen}><PiMapPinFill />View Map</button>
       <MapViewModal isOpen={isMapViewModalOpen} onClose={handleModalClose}/>
     </>
   );
