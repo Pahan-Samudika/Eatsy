@@ -34,10 +34,6 @@ admin-panel/npm-debug.log
 admin-panel/yarn-error.log
 admin-panel/package-lock.json
 
-
-# Docker
-**/.dockerignore
-
 # System Files
 .DS_Store
 Thumbs.db
