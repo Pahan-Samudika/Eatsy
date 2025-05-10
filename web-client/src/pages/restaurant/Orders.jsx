@@ -132,6 +132,7 @@ function Orders() {
     <>
       <div className={`${styles.paddingX} flex flex-col`}>
         <PageTitle title="Orders" backLink="/restaurant" />
+        <div className="pb-24">
         {orders.length === 0 ? (
           <p className="text-center">No orders found.</p>
         ) : (
@@ -191,7 +192,7 @@ function Orders() {
                               Reject
                             </button>
                           </div>
-                        ) : order.status === "accepted" || order.status === "preparing" ? (
+                        ) : order.status === "accepted" || order.status === "preparing" || order.status === "paid"  ? (
                           <select
                             className="select select-neutral select-sm w-full max-w-xs"
                             value={order.status}
@@ -213,6 +214,7 @@ function Orders() {
             </table>
           </div>
         )}
+        </div>
       </div>
       {isOrderViewModalOpen && (
         <OrderViewModal
