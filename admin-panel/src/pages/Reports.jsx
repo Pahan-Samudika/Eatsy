@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { paymentAPI } from '../../../admin-panel/src/services';
+import { paymentAPI } from '../services';
 import { useToast } from '../utils/alert-utils/ToastUtil';
 
 function Reports() {
