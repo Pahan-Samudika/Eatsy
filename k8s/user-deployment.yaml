@@ -14,6 +14,28 @@ spec:
     spec:
       containers:
       - name: user-service
-        image: keizer2002/user-service:latest
+        image: dilinajayalath/user-service:latest
         ports:
         - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: user-service-env
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10

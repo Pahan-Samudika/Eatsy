@@ -1,38 +1,41 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-gateway
+  name: web-client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api-gateway
+      app: web-client
   template:
     metadata:
       labels:
-        app: api-gateway
+        app: web-client
     spec:
       containers:
-      - name: api-gateway
-        image: dilinajayalath/api-gateway:latest
+      - name: web-client
+        image: dilinajayalath/web-client:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: web-client-env
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
+            cpu: "300m"
+            memory: "384Mi"
           requests:
-            cpu: "200m"
-            memory: "256Mi"
+            cpu: "150m"
+            memory: "192Mi"
         livenessProbe:
           httpGet:
-            path: /health
-            port: 8080
+            path: /
+            port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /health
-            port: 8080
+            path: /
+            port: 80
           initialDelaySeconds: 5
           periodSeconds: 10

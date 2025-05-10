@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-client-env
+data:
+  VITE_USER_API_URL: "http://api-gateway:8080/user"
+  VITE_RESTAURANTS_API_URL: "http://api-gateway:8080/restaurant"
+  VITE_ORDERS_API_URL: "http://api-gateway:8080/order"
+  VITE_DELIVERY_API_URL: "http://api-gateway:8080/delivery"
+  VITE_PAYMENT_API_URL: "http://api-gateway:8080/payment"
+  VITE_NOTIFICATIONS_API_URL: "http://api-gateway:8080/notification"
+  VITE_ORDERS_SOCKET_URL: "http://api-gateway:8080/order"
+  VITE_PUBLISHABLE_KEY: "pk_test_51RG1bbA7hlVwuVdkBAeaOueLmnf2r9SdcM65nNWb9AfMLHLaJp87n2v2fLuUKeil7F9o6RfdmCGhd9EcracvjtDh003Vm8krVT"
+  VITE_SUPABASE_URL: "https://xqbbqrlljllyfijuxiwg.supabase.co"
+  VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxYmJxcmxsamxseWZpanV4aXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3NTQ4MDAsImV4cCI6MjA2MTMzMDgwMH0.E_KkMksBSG21p_o3EdJN0QSuc6K6OaS9uARyEI-u4_Q"
+  VITE_MAPBOX_TOKEN: "pk.eyJ1IjoiamFrYWRwIiwiYSI6ImNtOXZqa3V0ODBnNDYycXNjMGZsMDZ6bXEifQ._21wZoGlO774ykfUi1X7Rw"

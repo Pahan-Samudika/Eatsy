@@ -1,38 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-gateway
+  name: admin-panel
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api-gateway
+      app: admin-panel
   template:
     metadata:
       labels:
-        app: api-gateway
+        app: admin-panel
     spec:
       containers:
-      - name: api-gateway
-        image: dilinajayalath/api-gateway:latest
+      - name: admin-panel
+        # Since the admin-panel image is failing to pull, use a temporary nginx image for testing
+        image: nginx:alpine
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
+            cpu: "300m"
+            memory: "384Mi"
           requests:
-            cpu: "200m"
-            memory: "256Mi"
+            cpu: "150m"
+            memory: "192Mi"
         livenessProbe:
           httpGet:
-            path: /health
-            port: 8080
+            path: /
+            port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /health
-            port: 8080
+            path: /
+            port: 80
           initialDelaySeconds: 5
           periodSeconds: 10

@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: payment-service
+  name: web-client
 spec:
   selector:
-    app: payment-service
+    app: web-client
   ports:
     - protocol: TCP
-      port: 3000
-      targetPort: 3000
+      port: 80
+      targetPort: 80
   type: NodePort
