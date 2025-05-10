@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { userAPI } from '../services';
 import { useToast } from '../utils/alert-utils/ToastUtil';
-import { sendVerifiedNotification } from '../utils/notification-utils/notificationUtil';
 
 function UserManagement() {
   const [deliveryPersons, setDeliveryPersons] = useState([]);

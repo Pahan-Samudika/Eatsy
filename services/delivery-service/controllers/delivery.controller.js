@@ -2,10 +2,10 @@ const axios = require("axios");
 const Delivery = require("../models/delivery.model");
 const { sendSMS, sendEmail } = require("../services/notification.service");
 // const { getIO } = require("../../order-service/sockets/socket");
-const ORDER_SERVICE_URL =
-  process.env.ORDER_SERVICE_URL || "http://localhost:4002";
-const USER_SERVICE_URL =
-  process.env.USER_SERVICE_URL || "http://localhost:4000";
+const ORDER_SERVICE_API_URL =
+  process.env.ORDER_SERVICE_URL || "http://order-service:3000";
+const USER_SERVICE_API_URL =
+  process.env.USER_SERVICE_URL || "http://user-service:3000";
 
 exports.assignDeliveryPerson = async (req, res) => {
   try {
@@ -16,7 +16,7 @@ exports.assignDeliveryPerson = async (req, res) => {
     // Fetch order from Order Service
     let order;
     try {
-      const response = await axios.get(`${ORDER_SERVICE_URL}/api/order/${id}`);
+      const response = await axios.get(`${ORDER_SERVICE_API_URL}/api/order/${id}`);
       order = response.data;
       console.log("Fetched order:", order);
     } catch (error) {
@@ -48,7 +48,7 @@ exports.assignDeliveryPerson = async (req, res) => {
     let deliveryPersons;
     try {
       const response = await axios.get(
-        `${USER_SERVICE_URL}/api/deliveryPerson/${deliveryPersonId}`
+        `${USER_SERVICE_API_URL}/api/deliveryPerson/${deliveryPersonId}`
       );
       deliveryPersons = response.data;
       console.log("Fetched delivery persons:", deliveryPersons);
@@ -74,7 +74,7 @@ exports.assignDeliveryPerson = async (req, res) => {
     // Update delivery person in User Service
     try {
       await axios.put(
-        `${USER_SERVICE_URL}/api/deliveryPerson/${deliveryPerson._id}`,
+        `${USER_SERVICE_API_URL}/api/deliveryPerson/${deliveryPerson._id}`,
         { availability: false }
       );
     } catch (error) {
@@ -87,7 +87,7 @@ exports.assignDeliveryPerson = async (req, res) => {
 
     // Update order status in Order Service
     try {
-      await axios.put(`${ORDER_SERVICE_URL}/order/status/${id}`, {
+      await axios.put(`${ORDER_SERVICE_API_URL}/api/order/status/${id}`, {
         status: "ready",
       });
 
@@ -125,7 +125,7 @@ exports.getDeliveryStatus = async (req, res) => {
     let deliveryPerson;
     try {
       const response = await axios.get(
-        `${USER_SERVICE_URL}/api/deliverPerson/${delivery.deliveryPersonId}`
+        `${USER_SERVICE_API_URL}/api/deliverPerson/${delivery.deliveryPersonId}`
         // { headers: { Authorization: `Bearer ${process.env.SERVICE_JWT}` } }
       );
       deliveryPerson = response.data;
@@ -163,7 +163,7 @@ exports.updateDeliveryStatus = async (req, res) => {
     if (status === "delivered") {
       try {
         await axios.put(
-          `${USER_SERVICE_URL}/api/deliveryPerson/${delivery.deliveryPersonId}`,
+          `${USER_SERVICE_API_URL}/api/deliveryPerson/${delivery.deliveryPersonId}`,
           { availability: true }
           // { headers: { Authorization: `Bearer ${process.env.SERVICE_JWT}` } }
         );
@@ -177,7 +177,7 @@ exports.updateDeliveryStatus = async (req, res) => {
     // Update order status in Order Service
     try {
       await axios.put(
-        `${ORDER_SERVICE_URL}/api/delivery/order/${id}/status`,
+        `${ORDER_SERVICE_API_URL}/api/delivery/order/${id}/status`,
         { status }
         // { headers: { Authorization: `Bearer ${process.env.SERVICE_JWT}` } }
       );
@@ -234,7 +234,7 @@ exports.updateDeliveryPersonLocation = async (req, res) => {
     // Update location in User Service
     try {
       await axios.put(
-        `${USER_SERVICE_URL}/api/deliverPerson/${deliveryPersonId}`,
+        `${USER_SERVICE_API_URL}/api/deliverPerson/${deliveryPersonId}`,
         { location },
         { headers: { Authorization: `Bearer ${process.env.SERVICE_JWT}` } }
       );
@@ -273,7 +273,7 @@ exports.updateOrderStatusByDeliveryPerson = async (req, res) => {
     // Update the order status in Order Service
     try {
       await axios.put(
-        `${ORDER_SERVICE_URL}/api/delivery/order/${orderId}/status`,
+        `${ORDER_SERVICE_API_URL}/api/delivery/order/${orderId}/status`,
         { status }
         // { headers: { Authorization: `Bearer ${process.env.SERVICE_JWT}` } }
       );
