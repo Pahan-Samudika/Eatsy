@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { formatCustomDate } from "../../../utils/format-utils/DateUtil";
 import { formatStatusBadge } from "../../../utils/format-utils/StatusUtil";
 import { formatCurrency } from "../../../utils/format-utils/CurrencyUtil";
 import OrderTimeline from "../../Timelines/Customer/OrderTimeline";
-import MapViewButton from "../../MapView/MapViewButton";
+import { PiMapPinFill } from "react-icons/pi";
+import ClientMapView from "../../ClientMapView/ClientMapView";
 
 function OrderAccordionItem({ order, isFirstItem }) {
+  const [showMap, setShowMap] = useState(false);
+
   const calculateSubtotal = (items) => {
     return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
@@ -30,7 +33,30 @@ function OrderAccordionItem({ order, isFirstItem }) {
         </div>
         <div className="flex flex-row items-center gap-4">
           <small>{formatCustomDate(order.createdAt)}</small>
-          {order.status==="assigned" || order.status==="picked_up" && <MapViewButton />}
+          {(order.status === "assigned" || order.status === "picked_up") && (
+            <>
+              <button
+                className="btn btn-primary btn-sm rounded-full text-sm z-10"
+                onClick={() => setShowMap(true)}
+              >
+                <PiMapPinFill />
+                View Map
+              </button>
+              {showMap && (
+                <dialog open className="modal modal-bottom sm:modal-middle">
+                  <div className="modal-box max-w-3xl">
+                    <button
+                      className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                      onClick={() => setShowMap(false)}
+                    >
+                      ✕
+                    </button>
+                    <ClientMapView orderId={order._id} />
+                  </div>
+                </dialog>
+              )}
+            </>
+          )}
         </div>
       </div>
       <div className="collapse-content text-sm">
