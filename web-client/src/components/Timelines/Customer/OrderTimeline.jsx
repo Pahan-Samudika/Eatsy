@@ -14,7 +14,7 @@ function OrderTimeline({ currentStatus = "pending" }) {
     "preparing",
     "ready",
     "assigned",
-    "pickup",
+    "picked_up",
     "delivered",
   ];
 
@@ -33,7 +33,7 @@ function OrderTimeline({ currentStatus = "pending" }) {
       return { icon: <MdDoneAll />, name: "Ready" };
     } else if (status === "assigned") {
       return { icon: <MdOutlineAssignmentInd />, name: "Assigned" };
-    } else if (status === "pickup") {
+    } else if (status === "picked_up") {
       return { icon: <MdOutlineShoppingBag />, name: "Pickup" };
     } else if (status === "delivered") {
       return { icon: <MdDeliveryDining />, name: "Delivered" };

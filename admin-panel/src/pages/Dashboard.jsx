@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { paymentAPI, orderAPI, userAPI } from '../../../admin-panel/src/services';
+import { paymentAPI, orderAPI, userAPI } from '../services';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 function Dashboard() {

@@ -60,3 +60,13 @@ export const getMyRecentOrders = async () => {
         return [];
     }
 };
+
+export const getAllMenuItems = async () => {
+    try {
+        const response = await axios.get(restaurantAPI.getAllMenuItems);
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch menu items:", error.message);
+        return [];
+    }
+}
