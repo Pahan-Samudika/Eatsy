@@ -3,11 +3,11 @@ export const formatStatusBadge = (status) => {
       pending: { text: "Pending", badgeClass: "warning" },
       accepted: { text: "Accepted", badgeClass: "success" },
       rejected: { text: "Rejected", badgeClass: "error" },
-      paid: { text: "Paid", badgeClass: "warning" },
-      preparing: { text: "Preparing", badgeClass: "warning" },
-      ready: { text: "Ready", badgeClass: "warning" },
-      assigned: { text: "Assigned", badgeClass: "warning" },
-      picked_up: { text: "Pickup", badgeClass: "warning" },
+      paid: { text: "Paid", badgeClass: "neutral" },
+      preparing: { text: "Preparing", badgeClass: "info" },
+      ready: { text: "Ready", badgeClass: "info" },
+      assigned: { text: "Assigned", badgeClass: "accent" },
+      picked_up: { text: "Pickup", badgeClass: "secondary" },
       delivered: { text: "Delivered", badgeClass: "success" },
     };
   

@@ -21,7 +21,7 @@ function OrderAccordionItem({ order, isFirstItem }) {
         <div className="flex flex-row items-center gap-2">
           <h2>Reference No: {order.refNo}</h2>
           <div
-            className={`badge badge-sm badge-soft badge-${
+            className={`badge badge-lg badge-dash badge-${
               formatStatusBadge(order.status).badgeClass
             }`}
           >
